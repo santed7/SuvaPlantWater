@@ -38,6 +38,7 @@ Adafruit_MQTT_Subscribe subFeed = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/
 //Adafruit_MQTT_Publish pubFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/suvaRand");
 //Adafruit_MQTT_Publish pubFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/suvaButtonOnOff");
 Adafruit_MQTT_Publish pubFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/soilentGreen");
+//Adafruit_MQTT_Publish pubFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/pumpPIN");
 /************Declare Variables*************/
 unsigned int last, lastTime;
 float subValue,pubValue;
@@ -92,14 +93,16 @@ void loop() {
   // }
  //lines below for publishing
   if((millis()-lastTime > 9000)) {
+    if(soilentGreen>=200){
     if(mqtt.Update()) {
       pubFeed.publish(soilentGreen);
+      pubFeed.publish(pumpPIN);
       Serial.printf("Moisture reading is %i \n",soilentGreen);
         if(soilentGreen>2000) {
         Serial.printf("Plantsoil is too dry at %i \n",soilentGreen);
          digitalWrite(pumpPIN,HIGH);
          Serial.printf("Plant is getting H20 at %i \n",soilentGreen);
-         delay(750);
+         delay(350);
          digitalWrite(pumpPIN,LOW);
        }
           if(soilentGreen<=1500) {
@@ -110,6 +113,7 @@ void loop() {
       else{
 
       }
+  }
   }
 
   // if((millis()-lastTime > 7000)) {

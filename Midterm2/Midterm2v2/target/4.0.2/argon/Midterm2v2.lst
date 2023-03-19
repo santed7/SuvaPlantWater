@@ -1,5 +1,5 @@
 
-c:/Users/vcox/Documents/IoT/SuvaSmartRoom/Midterm2/Midterm2v2/target/4.0.2/argon/Midterm2v2.elf:     file format elf32-littlearm
+c:/Users/vcox/Documents/IoT/SuvaPlantWater/Midterm2/Midterm2v2/target/4.0.2/argon/Midterm2v2.elf:     file format elf32-littlearm
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
@@ -33,11 +33,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  14 .debug_macro  0003d897  00000000  00000000  001a06c4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_line   000429bc  00000000  00000000  001ddf5b  2**0
+ 15 .debug_line   00042a06  00000000  00000000  001ddf5b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_str    00136f63  00000000  00000000  00220917  2**0
+ 16 .debug_str    00136f67  00000000  00000000  00220961  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_frame  00007f70  00000000  00000000  0035787c  2**2
+ 17 .debug_frame  00007f70  00000000  00000000  003578c8  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -570,7 +570,7 @@ bool MQTT_ping() {
    b4320:	b537      	push	{r0, r1, r2, r4, r5, lr}
 TCPClient TheClient; 
    b4322:	4d18      	ldr	r5, [pc, #96]	; (b4384 <_GLOBAL__sub_I_myScale+0x64>)
- HX711 myScale (3, 17); // my (2) digital pins [2 are needed]
+ HX711 myScale (3, 4); // my (2) digital pins [2 are needed]
    b4324:	4818      	ldr	r0, [pc, #96]	; (b4388 <_GLOBAL__sub_I_myScale+0x68>)
   {}
 
@@ -580,7 +580,7 @@ TCPClient TheClient;
     client(client)
    b4326:	4c19      	ldr	r4, [pc, #100]	; (b438c <_GLOBAL__sub_I_myScale+0x6c>)
    b4328:	2380      	movs	r3, #128	; 0x80
-   b432a:	2211      	movs	r2, #17
+   b432a:	2204      	movs	r2, #4
    b432c:	2103      	movs	r1, #3
    b432e:	f000 fbd7 	bl	b4ae0 <_ZN5HX711C1Ehhh>
 TCPClient TheClient; 
@@ -7457,8 +7457,8 @@ TwoWire& __fetch_global_Wire()
    b6ed8:	7574 6572 7220 6165 6964 676e 6920 2073     ture reading is 
    b6ee8:	6925 0a20 7300 6e61 6574 3764 6900 2e6f     %i ..santed7.io.
    b6ef8:	6461 6661 7572 7469 632e 6d6f 6100 6f69     adafruit.com.aio
-   b6f08:	665f 574f 3765 7236 474c 724a 4377 674e     _fOWe76rLGJrwCNg
-   b6f18:	6a4b 6d64 4258 7a59 7478 7056 0057 6173     KjdmXBYzxtVpW.sa
+   b6f08:	445f 4b53 346d 5137 516a 6637 754f 665a     _DSKm47QjQ7fOuZf
+   b6f18:	3876 7777 7769 3742 364e 7448 004e 6173     v8wwiwB7N6HtN.sa
    b6f28:	746e 6465 2f37 6566 6465 2f73 7573 6176     nted7/feeds/suva
    b6f38:	7562 7474 6e6f 6e6f 666f 0066 6173 746e     buttononoff.sant
    b6f48:	6465 2f37 6566 6465 2f73 6f73 6c69 6e65     ed7/feeds/soilen

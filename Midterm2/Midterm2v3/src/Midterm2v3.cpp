@@ -20,6 +20,9 @@ void loop();
 #line 12 "c:/Users/vcox/Documents/IoT/SuvaPlantWater/Midterm2/Midterm2v3/src/Midterm2v3.ino"
 ;
 int soilentGreen=A5; //moistSensor readings
+int pumpState;
+int pumpread;
+const int pumpPIN=D11;
 
 /*
 Copy the Adafruit.io Setup line and the next four lines to a credentials.h file
@@ -56,6 +59,7 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 
 void setup() {
   pinMode(soilentGreen, INPUT);
+  pinMode(pumpPIN, OUTPUT);
   pinMode(D7,OUTPUT);
   Serial.begin(9600);
   waitFor(Serial.isConnected,10000);
@@ -100,9 +104,16 @@ void loop() {
     if(mqtt.Update()) {
       pubFeed.publish(soilentGreen);
       Serial.printf("Moisture reading is %i \n",soilentGreen);
-      // if(soilentGreen>2000) {
-      // Serial.printf("Plantsoil is too dry at %i \n",soilentGreen);
-      // }
+        if(soilentGreen>2000) {
+        Serial.printf("Plantsoil is too dry at %i \n",soilentGreen);
+         digitalWrite(pumpPIN,HIGH);
+         Serial.printf("Plant is getting H20 at %i \n",soilentGreen);
+         delay(750);
+         digitalWrite(pumpPIN,LOW);
+       }
+          if(soilentGreen<=1500) {
+          Serial.printf("Plantsoil is too wet at %i \n",soilentGreen);
+          }
     lastTime = millis();
     }
       else{

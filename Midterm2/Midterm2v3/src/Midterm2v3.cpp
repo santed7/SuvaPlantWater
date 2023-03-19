@@ -117,7 +117,7 @@ void loop() {
           if(soilentGreen<=1500) {
           Serial.printf("Plantsoil is too wet at %i \n",soilentGreen);
           }
-    lastTime = millis();
+    lastTime = millis(); //gets the current time
     }
       else{
 

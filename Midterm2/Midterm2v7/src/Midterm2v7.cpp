@@ -154,7 +154,7 @@ void loop() {
       air.publish(airQuality);
       dust.publish(concentration);
       //pumpread.publish(pumpPIN);
-      Serial.printf("Moisture reading is %i \n",soilentReadgreen);
+      Serial.printf("Moisture reading is %i which is decent :) \n",soilentReadgreen);
         if(soilentReadgreen>2000) {
         Serial.printf("Plantsoil is too dry at %i \n",soilentReadgreen);
          digitalWrite(pumpPIN,HIGH);
@@ -182,9 +182,9 @@ void loop() {
         ratio = lowpulseoccupancy/(sampletime_ms*10.0);  // Integer percentage 0=>100
         concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
        if(lowpulseoccupancy>0){
-        Serial.printf("LowPO is %i ,",lowpulseoccupancy);
-        Serial.printf("Ratio is %f ,",ratio);
-        Serial.printf("Concentration is %f \n",concentration);
+        //Serial.printf("LowPO is %i ,",lowpulseoccupancy);
+        //Serial.printf("Ratio is %f ,",ratio);
+        Serial.printf("Dust Concentration is %f \n",concentration);
       }
 
         lowpulseoccupancy = 0;

@@ -27,7 +27,6 @@ float concentration = 0;
 
 /*
 Copy the Adafruit.io Setup line and the next four lines to a credentials.h file
-
 //************************* Adafruit.io Setup *****************************************
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883        // use 1883 for SSL

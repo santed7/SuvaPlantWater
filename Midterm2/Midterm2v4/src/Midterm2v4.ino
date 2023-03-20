@@ -5,6 +5,7 @@
  * Date: 19-MAR-2023
  */
 
+#include <math.h>
 #include <Adafruit_MQTT.h>
 #include "Adafruit_MQTT/Adafruit_MQTT_SPARK.h"
 #include "Adafruit_MQTT/Adafruit_MQTT.h"
@@ -14,6 +15,15 @@ int soilentGreen=A5; //moistSensor readings
 int pumpState;
 int pumpread;
 const int pumpPIN=D11;
+
+int pin = 8;
+unsigned long duration;
+unsigned long starttime;
+unsigned long sampletime_ms = 30000;//sampe 30s ;
+unsigned long lowpulseoccupancy = 0;
+float ratio = 0;
+float concentration = 0;
+
 
 /*
 Copy the Adafruit.io Setup line and the next four lines to a credentials.h file
@@ -52,6 +62,8 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 void setup() {
   pinMode(soilentGreen, INPUT);
   pinMode(pumpPIN, OUTPUT);
+  pinMode(pin,INPUT);
+  starttime = millis();//get the current time;
   pinMode(D7,OUTPUT);
   Serial.begin(9600);
   waitFor(Serial.isConnected,10000);
@@ -116,13 +128,23 @@ void loop() {
   }
   }
 
-  // if((millis()-lastTime > 7000)) {
-  //   if(mqtt.Update()) {
-  //     //pubFeed.publish(suvaButtonRead);
-    
-  //     } 
-  //   lastTime = millis();
-  // }
+    duration = pulseIn(pin, LOW);
+    lowpulseoccupancy = lowpulseoccupancy+duration;
+
+    if ((millis()-starttime) > sampletime_ms)//if the sampel time == 30s
+    {
+        ratio = lowpulseoccupancy/(sampletime_ms*10.0);  // Integer percentage 0=>100
+        concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve
+   
+       if(lowpulseoccupancy>0){
+        Serial.printf("LowPO is %i ,",lowpulseoccupancy);
+        Serial.printf("Ratio is %f ,",ratio);
+        Serial.printf("Concentration is %f \n",concentration);
+    }
+
+        lowpulseoccupancy = 0;
+        starttime = millis();
+    }
 }
 
 // Function to connect and reconnect as necessary to the MQTT server.

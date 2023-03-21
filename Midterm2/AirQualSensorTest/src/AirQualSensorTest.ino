@@ -1,52 +1,38 @@
-/*
- * Project AirQualSensorTest
- * Description:
- * Author:
- * Date:
- */
+ #include "Air_Quality_Sensor.h"
 
-/*
-AirQuality Demo V1.0.
-connect to A1 to start testing. it will needs about 20s to start
-* By: http://www.seeedstudio.com
-*/
-#include "Grove_Air_Quality_Sensor.h"
-#include "Arduino.h"
-AirQualitySensor airqualitysensor;
-int current_quality =-1;
-void setup()
-{
-Serial.begin(9600);
-airqualitysensor.init(14);
-}
-void loop()
-{
-current_quality=airqualitysensor.slope();
-if (current_quality >= 0)// if a valid data returned.
-{
-if (current_quality==0)
-Serial.println("High pollution! Force signal active");
-else if (current_quality==1)
-Serial.println("High pollution!");
-else if (current_quality==2)
-Serial.println("Low pollution!");
-else if (current_quality ==3)
-Serial.println("Fresh air");
-}
-}
-// ISR(TIMER2_OVF_vect)
-// {
-// }
-if(airqualitysensor.counter==122)//set 2 seconds as a detected duty
-{
+AirQualitySensor sensor(A0);
 
-airqualitysensor.last_vol=airqualitysensor.first_vol;
-airqualitysensor.first_vol=analogRead(A0); // change this value if you use another A port
-airqualitysensor.counter=0;
-airqualitysensor.timer_index=1;
-PORTB=PORTB^0x20;
+void setup(void) {
+  Serial.begin(9600);
+  while (!Serial);
+
+  Serial.printf("Waiting sensor to init...");
+  delay(20000);
+  
+  if (sensor.init()) {
+    Serial.printf("Sensor ready.");
+  }
+  else {
+    Serial.printf("Sensor ERROR!");
+  }
 }
-else
-{
-airqualitysensor.counter++;
+
+void loop(void) {
+  int quality = sensor.slope();
+  
+  if (quality == AirQualitySensor::FORCE_SIGNAL) {
+    Serial.printf("High pollution! Force signal active.");
+  }
+  else if (quality == AirQualitySensor::HIGH_POLLUTION) {
+    Serial.printf("We have HIGH POLLUTION because our sensor value is: %i OH NO!!! \n", sensor.getValue());
+  }
+  else if (quality == AirQualitySensor::LOW_POLLUTION) {
+    Serial.printf("We have LOW POLLUTION because our sensor value is: %i YEAH for LOW POLLUTION!!! \n", sensor.getValue());
+  }
+  else if (quality == AirQualitySensor::FRESH_AIR) {
+    Serial.printf("We have FRESH AIR because our sensor value is: %i YEAH for FRESH AIR!!! \n", sensor.getValue());
+  }
+  
+  delay(1000);
+  
 }

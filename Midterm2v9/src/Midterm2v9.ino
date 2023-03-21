@@ -19,6 +19,8 @@
 #include "Grove_Air_Quality_Sensor.h"
 #include "Air_Quality_Sensor.h"
 
+#define OLED_RESET D4
+
 
 /************Declare Variables*************/
 unsigned int last, lastTime;
@@ -36,31 +38,45 @@ int airSensorpin=A3; //airQualUnit pin
 int airQuality;//air Quality reading
 
 
-const int dustReadpin = 8;
+const int dustReadpin = D8;
 int dustReadg;
 
 unsigned long duration;
 unsigned long starttime;
 unsigned long sampletime_ms = 30000;//sampe 30s ;
-unsigned long lowpulseoccupancy = 0;
-float ratio = 0;
-float concentration = 0;
+unsigned long lowpulseoccupancy = 0.0;
+float ratio = 0.0;
+float concentration = 0.0;
 
 float tempC;
-float tempF = 0;
+float tempF;
 float pressPA;
 float humidRH;
+int hexAddress;
+
+int rot1=1;
+int rot2=2;
+int rot3=3;
+int rot0=0;
 
 /************Declare Functions*************/
 void MQTT_connect();
 bool MQTT_ping();
+bool status;
+
+#if (SSD1306_LCDHEIGHT != 64)
+#error("Height incorrect, please fix Adafruit_SSD1306.h!");
+#endif
+
+
+
 
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
 
 Adafruit_BME280 bme;
-bool status;
 AirQualitySensor sensor(A0);
+Adafruit_SSD1306 display(OLED_RESET);
 
 
 /*
@@ -97,6 +113,8 @@ void setup() {
   Serial.begin(9600);
   waitFor(Serial.isConnected,10000);
 
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // initialize with the I2C addr 0x3C (for the 128x64)
+
   // Connect to Internet but not Particle Cloud
   WiFi.on();
   WiFi.connect();
@@ -117,6 +135,55 @@ void setup() {
   else {
     Serial.printf("Sensor ERROR!");
   }
+  display.setCursor(0,0);
+  display.display(); //this will show the Adafruit logo (splashscreen)
+  delay(1500); //this will delay the splashscreen to increase the marketing effect
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(25,25);
+  display.printf("Hello\n");
+  display.display();
+    delay(1500); 
+  display.clearDisplay();
+  display.setCursor(5,25);
+  display.printf("World\n");
+  display.display();
+   delay(1500); 
+  display.clearDisplay();
+  display.setCursor(5,25);
+  display.printf("My name is");
+  display.display();
+    delay(1000);
+  display.clearDisplay();
+  display.setCursor(5,25);
+  display.printf("Se%cor",164);
+  display.display();
+  delay(1000);
+  display.clearDisplay();
+  display.setCursor(3,25);
+  display.printf("Vernon Cox");
+  display.display();
+  delay(2000);
+  display.clearDisplay();
+  display.setCursor(0,25);
+  display.printf("BornOnDate:");
+  display.display();
+  delay(2000);
+  display.clearDisplay();
+  display.setCursor(15,25);
+  display.printf("%c%c%c%c%c%c%c", 50,54,65,80,82,53,56);
+  display.display();
+  delay(3000);
+
+  display.invertDisplay(true);
+  delay(1000);
+
+  status = bme.begin(0x76);
+    if (status == false){
+    Serial.printf("BME280 at address 0x%02X failed to start\n", hexAddress);
+    }
+
 
   // Setup MQTT subscription
   //mqtt.subscribe(&subFeed);//must tell Argon to subscribe..ima leave this line in so I know how to do it.
@@ -128,13 +195,53 @@ void loop() {
   MQTT_ping();
   soilentReadgreen=analogRead(soilentGreenpin);
   dustReadg=analogRead(dustReadpin);
-  //airQuality=analogRead(airSensorpin);
+
+         //Getting data from BME280
+    tempC=bme.readTemperature(); //deg C
+    tempF=((tempC*1.8)+32);
+    pressPA=bme.readPressure(); //pascals
+    humidRH = bme.readHumidity(); //%RH
   
 
   // this is our 'wait for incoming subscription packets' busy subloop 
   Adafruit_MQTT_Subscribe *subscription;
 
+       //Getting data from BME280
+    tempC=bme.readTemperature(); //deg C
+    tempF=((tempC*1.8)+32);
+    pressPA=bme.readPressure(); //pascals
+    humidRH = bme.readHumidity(); //%RH
 
+  Serial.printf("The temp in is: %0.1fC\n",tempC); //shows the temp in c
+  Serial.printf("The temp in is: %0.1fF\n",tempF); //shows the temp in f
+  display.clearDisplay();
+  display.setCursor(0,17);
+  display.setTextSize(2);  
+  display.printf("TheTemp in is: %0.1fC\n",tempC); //shows the temp in c
+  display.display();
+  display.setCursor(0,17);
+  delay (1500);
+  display.clearDisplay();
+  display.printf("TheTemp in is: %0.1fF\n",tempF); //shows the temp in f
+  display.display();
+  display.setCursor(0,17);
+  delay (1500);
+
+  Serial.printf("The pressure in pas is: %0.1f\n",pressPA); //shows the pressure
+  display.clearDisplay();
+  display.setTextSize(2);  
+  display.printf("ThePsr is: %0.1f\n",pressPA); //shows the temp in c
+  display.display();
+  display.setCursor(0,17);
+  delay (1500);
+
+  Serial.printf("The HumidT is: %0.1f%%\n",humidRH); //shows the temp in c
+  display.clearDisplay();
+  display.setTextSize(2);  
+  display.printf("The HumidT is: %0.1f%%\n",humidRH); //shows the temp in c
+  display.display();
+  display.setCursor(0,17);
+  delay (1500);
 
 
   //testing the dust levels
@@ -194,13 +301,42 @@ void loop() {
   else if (quality == AirQualitySensor::FRESH_AIR) {
     Serial.printf("We have FRESH AIR because our sensor value is: %i YEAH for FRESH AIR!!! \n", sensor.getValue());
   }
-
-
     lastTime = millis(); //gets the current time
     }
-      // else{
+  //OLED display information
+display.setTextSize(2);  
+display.clearDisplay();
+display.setTextSize(1);
+display.setCursor(5,25);
+display.printf("Quality of is: %i FRESH AIR!!! \n", sensor.getValue());
+display.display();
+delay(12000);
 
-      // }
+display.clearDisplay();
+
+display.setRotation(rot2);
+display.setCursor(5,15);
+display.printf("Vernon Cox");
+display.display();
+delay(2000);
+
+display.clearDisplay();
+
+display.setRotation(rot3);
+display.setCursor(5,15);
+display.printf("Vernon Cox");
+display.display();
+delay(2000);
+
+display.clearDisplay();
+display.setTextSize(2);
+display.setRotation(rot0);
+display.setCursor(5,25);
+display.printf("Vernon Cox");
+display.display();
+delay(2000);
+
+
   }
   }
 
